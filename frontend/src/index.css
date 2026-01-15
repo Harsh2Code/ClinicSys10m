@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Montserrat:wght@700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased text-slate-200;
+    background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 100%);
+  }
+}
+
+/* Custom Glassmorphism Utility */
+.glass-panel {
+  @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+}
+
+/* Smooth transitions for all buttons */
+button, input, textarea {
+  @apply transition-all duration-300;
+}
