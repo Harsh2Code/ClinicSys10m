@@ -9,11 +9,18 @@ router.get('/', auth, async (req, res) => {
   try {
     let patients;
     if (req.user.role === 'doctor') {
-      // Get patients with tokens assigned to this doctor
-      const tokens = await Token.find({ assignedDoctor: req.user._id }).populate('patient');
-      patients = tokens.map(t => t.patient);
+      // Get patients with pending tokens (waiting to be assigned)
+      const tokens = await Token.find({ status: 'pending' }).populate('patient');
+      const patientIds = tokens.map(t => t.patient._id);
+      patients = await Patient.find({ _id: { $in: patientIds } }).populate('currentToken');
     } else {
-      patients = await Patient.find(req.query.email ? { email: req.query.email } : {});
+      // For receptionist: Get all patients, sorted by latest prescription date or creation date
+      patients = await Patient.find().populate('currentToken').populate('prescriptions');
+      patients.sort((a, b) => {
+        const aLatest = a.prescriptions.length > 0 ? Math.max(...a.prescriptions.map(p => new Date(p.createdAt).getTime())) : new Date(a.createdAt).getTime();
+        const bLatest = b.prescriptions.length > 0 ? Math.max(...b.prescriptions.map(p => new Date(p.createdAt).getTime())) : new Date(b.createdAt).getTime();
+        return bLatest - aLatest;
+      });
     }
     res.json(patients);
   } catch (err) {
@@ -26,7 +33,23 @@ router.post('/', auth, roleAuth(['receptionist']), async (req, res) => {
   try {
     const patient = new Patient(req.body);
     await patient.save();
-    res.status(201).json(patient);
+
+    // Generate token for the new patient
+    let tokenNumber;
+    do {
+      tokenNumber = Math.floor(100 + Math.random() * 900);
+    } while (await Token.findOne({ tokenNumber }));
+
+    const token = new Token({ tokenNumber, patient: patient._id });
+    await token.save();
+
+    // Update patient's current token
+    patient.currentToken = token._id;
+    await patient.save();
+
+    // Populate currentToken before returning
+    const populatedPatient = await Patient.findById(patient._id).populate('currentToken');
+    res.status(201).json(populatedPatient);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }

@@ -9,7 +9,7 @@ router.get('/', auth, async (req, res) => {
   try {
     let tokens;
     if (req.user.role === 'doctor') {
-      tokens = await Token.find({ assignedDoctor: req.user._id }).populate('patient');
+      tokens = await Token.find({ $or: [{ assignedDoctor: req.user._id }, { status: 'pending' }] }).populate('patient');
     } else {
       tokens = await Token.find().populate('patient');
     }

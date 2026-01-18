@@ -1,12 +1,42 @@
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import PrescriptionModal from '@/components/PrescriptionModal';
 import { MinimalNavbar } from '../components/Navbar';
 import { InteractionCard } from '../components/InteractionCard';
 import { LuStethoscope } from 'react-icons/lu';
 
 export default function DoctorDash() {
-  const mockPatients = [
-    { name: "Julian Casablancas", age: 42, token: "082", status: "WAITING" },
-    { name: "Sarah Konnor", age: 29, token: "083", status: "WAITING" }
-  ];
+  const { user } = useSelector(state => state.auth);
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = async () => {
+    try {
+      const response = await axios.get('/api/patients');
+      setPatients(response.data);
+    } catch (err) {
+      toast.error('Failed to fetch patients');
+    }
+  };
+
+  const calculateAge = (dob) => {
+    if (!dob) return 'N/A';
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -18,6 +48,7 @@ export default function DoctorDash() {
               Clinical <span className="font-bold">Queue</span>
             </h2>
             <p className="text-white/30 text-xs uppercase tracking-[0.2em]">Live updates from reception</p>
+            <p className="text-white/70 text-sm">Welcome, {user?.name} ({user?.role})</p>
           </div>
           <div className="p-4 rounded-sm border border-white/5 bg-white/[0.02]">
             <LuStethoscope size={24} className="text-[#b15df6]" />
@@ -25,11 +56,32 @@ export default function DoctorDash() {
         </header>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockPatients.map((p, i) => (
-            <InteractionCard key={i} patient={p} onSelect={(p) => console.log(p)} />
+          {patients.map((p, i) => (
+            <InteractionCard
+              key={i}
+              patient={{
+                name: p.name,
+                token: p.currentToken?.tokenNumber || 'N/A',
+                status: p.currentToken?.status || 'No Token',
+                age: calculateAge(p.dateOfBirth)
+              }}
+              onSelect={(p) => {
+                const fullPatient = patients.find(pt => pt.name === p.name);
+                setSelectedPatient(fullPatient);
+                setIsModalOpen(true);
+              }}
+            />
           ))}
         </div>
       </main>
+
+      {selectedPatient && (
+        <PrescriptionModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          patient={selectedPatient}
+        />
+      )}
     </div>
   );
 }
