@@ -9,7 +9,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: ['https://direc10.vercel.app', 'https://direc10.onrender.com']
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Connect to MongoDB
