@@ -5,6 +5,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import ModernInput from '../components/ModernInput';
 import { MinimalNavbar } from '../components/Navbar';
+import API_URL from '../lib/api';
 
 export default function ReceptionistDash() {
   const [patient, setPatient] = useState({ name: '', email: '', phone: '', address: '', dateOfBirth: '', medicalHistory: '' });
@@ -19,7 +20,7 @@ export default function ReceptionistDash() {
 
   const fetchPatients = async () => {
     try {
-      const response = await axios.get('/api/patients');
+      const response = await axios.get(`${API_URL}/patients`);
       setPatients(response.data);
     } catch (err) {
       toast.error('Failed to fetch patients');
@@ -30,7 +31,7 @@ export default function ReceptionistDash() {
     e.preventDefault();
     try {
       // Create patient (token is automatically generated in backend)
-      const patientResponse = await axios.post('/api/patients', patient);
+      const patientResponse = await axios.post(`${API_URL}/patients`, patient);
       const newPatient = patientResponse.data;
 
       toast.success(`Patient registered! Token #${newPatient.currentToken.tokenNumber} issued!`);
@@ -43,7 +44,7 @@ export default function ReceptionistDash() {
 
   const createBill = async (patientId, items, total) => {
     try {
-      await axios.post('/api/bills', { patient: patientId, items, totalAmount: total });
+      await axios.post(`${API_URL}/bills`, { patient: patientId, items, totalAmount: total });
       toast.success('Bill created successfully');
     } catch (err) {
       toast.error('Error creating bill');

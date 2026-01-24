@@ -6,6 +6,7 @@ import PrescriptionModal from '@/components/PrescriptionModal';
 import { MinimalNavbar } from '../components/Navbar';
 import { InteractionCard } from '../components/InteractionCard';
 import { LuStethoscope } from 'react-icons/lu';
+import API_URL from '../lib/api';
 
 export default function DoctorDash() {
   const { user } = useSelector(state => state.auth);
@@ -19,7 +20,7 @@ export default function DoctorDash() {
 
   const fetchPatients = async () => {
     try {
-      const response = await axios.get('/api/patients');
+      const response = await axios.get(`${API_URL}/patients`);
       setPatients(response.data);
     } catch (err) {
       toast.error('Failed to fetch patients');

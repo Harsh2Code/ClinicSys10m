@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import ModernInput from './ModernInput';
+import API_URL from '../lib/api';
 
 const MEDICINES = [
   'Paracetamol', 'Ibuprofen', 'Aspirin', 'Amoxicillin', 'Ciprofloxacin',
@@ -28,7 +29,7 @@ export default function PrescriptionModal({ isOpen, onClose, patient }) {
 
   const fetchPrescriptions = async () => {
     try {
-      const response = await axios.get(`/api/prescriptions/patient/${patient._id}`);
+      const response = await axios.get(`${API_URL}/prescriptions/patient/${patient._id}`);
       setPrescriptions(response.data);
     } catch (err) {
       toast.error('Failed to fetch prescriptions');
@@ -52,7 +53,7 @@ export default function PrescriptionModal({ isOpen, onClose, patient }) {
       return;
     }
     try {
-      await axios.post('/api/prescriptions', {
+      await axios.post(`${API_URL}/prescriptions`, {
         patient: patient._id,
         medications,
         notes: ''

@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGr
 import { useMessage } from '../lib/MessageContext';
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '', role: 'admin' });
+  const [formData, setFormData] = useState({ email: '', password: '', role: '' });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector(state => state.auth);
@@ -24,9 +24,9 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-[#0a0a0a]" >
       <MinimalNavbar />
-      <div className="flex items-center justify-center min-h-screen p-4 pt-32">
+      <div className="flex items-center justify-center min-h-screen p-4 pt-16">
         <div className="w-full max-w-md p-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-md shadow-2xl"
-        style={{backgroundColor: "#120f14"}}>
+          style={{ backgroundColor: "#120f14" }}>
           <div className="flex flex-col items-center mb-8">
             <h1 className="mt-4 text-4xl font-montserrat tracking-[0.5rem] uppercase font-bold tracking-tighter">Direction</h1>
             <p className="text-white/50 text-sm">Clinic Management System</p>
@@ -39,6 +39,7 @@ export default function Login() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
+              autoComplete="email"
             />
             <ModernInput
               type="password"
@@ -46,6 +47,7 @@ export default function Login() {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
+              autoComplete="current-password"
             />
 
             <Select
@@ -53,14 +55,13 @@ export default function Login() {
               onValueChange={(value) => setFormData({ ...formData, role: value })}
             >
               <SelectTrigger className="w-full py-3 px-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                <SelectValue placeholder="Select a Role" />
+                <SelectValue placeholder="Select a Role" className="placeholder-center" /> 
               </SelectTrigger>
               <SelectContent>
-                <SelectGroup className="bg-[#191919fd] border-2 rounded" style={{color:"white"}}>
+                <SelectGroup className="bg-[#191919fd] border-2 rounded" style={{ color: "white" }}>
                   <SelectLabel className="mb-3">Roles</SelectLabel>
                   <SelectItem value="receptionist">Receptionist</SelectItem>
                   <SelectItem value="doctor">Doctor</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -72,6 +73,37 @@ export default function Login() {
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
+          <div className='text-left'>
+            <table className='mx-auto my-4'>
+              <tbody>
+                <tr>
+                  <th className='text-orange-400 bock-inline w-32'>
+                    Doctor
+                  </th>
+                  <td>
+                    doctor@example.com
+                  </td>
+                </tr>
+                <tr>
+
+                  <th className='text-blue-400'>
+                    Receptionist
+                  </th>
+                  <td>
+                    reception@example.com
+                  </td>
+                </tr>
+                <tr>
+                  <th>
+                    Password
+                  </th>
+                  <td>
+                    demo123
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

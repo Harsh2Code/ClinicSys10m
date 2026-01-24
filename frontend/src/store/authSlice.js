@@ -1,8 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-
-const API_URL = '/api';
+import API_URL from '../lib/api';
 
 export const login = createAsyncThunk('auth/login', async ({ email, password, role }, { rejectWithValue }) => {
   try {

@@ -4,6 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { MinimalNavbar } from '../components/Navbar';
 import BillingModal from '../components/BillingModal';
+import API_URL from '../lib/api';
 
 export default function PatientHistory() {
   const [patients, setPatients] = useState([]);
@@ -19,7 +20,7 @@ export default function PatientHistory() {
 
   const fetchPatients = async () => {
     try {
-      const response = await axios.get('/api/patients');
+      const response = await axios.get(`${API_URL}/patients`);
       setPatients(response.data);
     } catch (err) {
       toast.error('Failed to fetch patients');
@@ -28,7 +29,7 @@ export default function PatientHistory() {
 
   const fetchPrescriptions = async (patientId) => {
     try {
-      const response = await axios.get(`/api/prescriptions/patient/${patientId}`);
+      const response = await axios.get(`${API_URL}/prescriptions/patient/${patientId}`);
       setPrescriptions(response.data);
       setSelectedPatient(patients.find(p => p._id === patientId));
     } catch (err) {
